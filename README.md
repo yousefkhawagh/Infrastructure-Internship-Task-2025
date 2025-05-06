@@ -1,1 +1,1 @@
-# Infrastructure-Internship-Task-2025
+# 🛠️ Feature Proposal: Automated Re-encryption in `kubeseal` CLI
