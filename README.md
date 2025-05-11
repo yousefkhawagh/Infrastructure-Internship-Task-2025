@@ -147,11 +147,15 @@ kubectl  get  sealedsecrets  --all-namespaces  -o  json
 
 ```
 
-Go Code Implementation:
+# Go Code Implementation to Retrieve SealedSecrets from Kubernetes
 
-go
-Copy
-Edit
+This Go code retrieves SealedSecrets from a Kubernetes cluster using the `client-go` library and the SealedSecrets CRD provided by Bitnami.
+
+
+
+## Code Implementation
+
+```go
 package main
 
 import (
@@ -161,20 +165,16 @@ import (
     "k8s.io/client-go/kubernetes"
     "k8s.io/client-go/tools/clientcmd"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+    "bitnami.com/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1" // import SealedSecrets CRD
 )
 
-func getSealedSecrets(clientset *kubernetes.Clientset) ([]metav1.ObjectMeta, error) {
-    secretsList, err := clientset.CoreV1().Secrets("default").List(context.Background(), metav1.ListOptions{})
+func getSealedSecrets(clientset *kubernetes.Clientset) ([]v1alpha1.SealedSecret, error) {
+    // Replace 'default' with the namespace where you expect SealedSecrets
+    sealedSecretsList, err := clientset.SealedsecretsV1alpha1().SealedSecrets("default").List(context.Background(), metav1.ListOptions{})
     if err != nil {
         return nil, err
     }
-    var sealedSecrets []metav1.ObjectMeta
-    for _, secret := range secretsList.Items {
-        if secret.Annotations["sealedsecrets.bitnami.com/sealed-secrets-key"] != "" {
-            sealedSecrets = append(sealedSecrets, secret.ObjectMeta)
-        }
-    }
-    return sealedSecrets, nil
+    return sealedSecretsList.Items, nil
 }
 
 func main() {
@@ -196,6 +196,7 @@ func main() {
 
     fmt.Println("Found SealedSecrets:", sealedSecrets)
 }
+
 
   
 
