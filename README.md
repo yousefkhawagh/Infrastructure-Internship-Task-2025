@@ -424,6 +424,54 @@ Add `--log-output=path.log` and `--report=json` flags to capture:
 
 - Error details
 
+
+## Code Implementation
+
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "os"
+)
+
+type Report struct {
+    SecretName string `json:"secretName"`
+    Namespace  string `json:"namespace"`
+    Status     string `json:"status"`
+    Error      string `json:"error,omitempty"`
+}
+
+func writeReport(report Report, logFile string) error {
+    file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+    if err != nil {
+        return err
+    }
+    defer file.Close()
+
+    encoder := json.NewEncoder(file)
+    if err := encoder.Encode(report); err != nil {
+        return err
+    }
+    return nil
+}
+
+func main() {
+    report := Report{
+        SecretName: "example-secret",
+        Namespace:  "default",
+        Status:     "success",
+    }
+    logFile := "/path/to/log.json"
+    if err := writeReport(report, logFile); err != nil {
+        fmt.Println("Error writing report:", err)
+    }
+    fmt.Println("Report written successfully.")
+}
+
+```
+
   
 
 7.  **📈 Optimization**
