@@ -147,6 +147,56 @@ kubectl  get  sealedsecrets  --all-namespaces  -o  json
 
 ```
 
+Go Code Implementation:
+
+go
+Copy
+Edit
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "k8s.io/client-go/kubernetes"
+    "k8s.io/client-go/tools/clientcmd"
+    metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+func getSealedSecrets(clientset *kubernetes.Clientset) ([]metav1.ObjectMeta, error) {
+    secretsList, err := clientset.CoreV1().Secrets("default").List(context.Background(), metav1.ListOptions{})
+    if err != nil {
+        return nil, err
+    }
+    var sealedSecrets []metav1.ObjectMeta
+    for _, secret := range secretsList.Items {
+        if secret.Annotations["sealedsecrets.bitnami.com/sealed-secrets-key"] != "" {
+            sealedSecrets = append(sealedSecrets, secret.ObjectMeta)
+        }
+    }
+    return sealedSecrets, nil
+}
+
+func main() {
+    kubeconfig := "/path/to/kubeconfig"
+    config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+    if err != nil {
+        log.Fatalf("Failed to build kubeconfig: %v", err)
+    }
+
+    clientset, err := kubernetes.NewForConfig(config)
+    if err != nil {
+        log.Fatalf("Failed to create Kubernetes clientset: %v", err)
+    }
+
+    sealedSecrets, err := getSealedSecrets(clientset)
+    if err != nil {
+        log.Fatalf("Failed to get SealedSecrets: %v", err)
+    }
+
+    fmt.Println("Found SealedSecrets:", sealedSecrets)
+}
+
   
 
 Traverse and parse all SealedSecret resources. Extract name, namespace, and encrypted content.
