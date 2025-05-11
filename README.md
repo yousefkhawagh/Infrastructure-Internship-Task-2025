@@ -202,7 +202,9 @@ func main() {
 
 Traverse and parse all SealedSecret resources. Extract name, namespace, and encrypted content.
 
-  
+
+```
+
 
 2.  **🔐 Fetch Active Public Keys**
 
