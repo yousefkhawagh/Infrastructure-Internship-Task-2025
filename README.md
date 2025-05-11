@@ -321,7 +321,48 @@ func main() {
 
 Use `crypto.SealingKey.Encrypt()` from existing implementation.
 
-  
+
+
+## Code Implementation
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    "github.com/bitnami-labs/sealed-secrets/pkg/sealedsecrets"
+)
+
+func reencryptSecret(secret string, publicKey string) (string, error) {
+    key, err := sealedsecrets.ParsePublicKey(publicKey)
+    if err != nil {
+        return "", fmt.Errorf("failed to parse public key: %v", err)
+    }
+
+    encryptedSecret, err := sealedsecrets.Encrypt(secret, key)
+    if err != nil {
+        return "", fmt.Errorf("failed to encrypt secret: %v", err)
+    }
+
+    return encryptedSecret, nil
+}
+
+func main() {
+    publicKey := "<public-key>"
+    secret := "<decrypted-secret>"
+
+    encryptedSecret, err := reencryptSecret(secret, publicKey)
+    if err != nil {
+        log.Fatalf("Error re-encrypting secret: %v", err)
+    }
+
+    fmt.Println("Re-encrypted Secret:", encryptedSecret)
+}
+
+
+```  
 
 5.  **⬆️ Replace Existing SealedSecrets**
 
