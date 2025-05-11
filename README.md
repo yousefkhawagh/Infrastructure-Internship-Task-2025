@@ -215,8 +215,47 @@ Traverse and parse all SealedSecret resources. Extract name, namespace, and encr
 kubeseal  --controller-namespace=kube-system  --fetch-cert
 
 ```
+# Go Code Implementation to Fetch Active Public Key from a URL
 
-  
+This Go code fetches an active public key (in PEM format) from a specified URL and prints it.
+
+## Code Implementation
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+    "io/ioutil"
+)
+
+func fetchActivePublicKey() (string, error) {
+    resp, err := http.Get("https://<controller-url>/v1/cert.pem")
+    if err != nil {
+        return "", fmt.Errorf("failed to fetch public key: %v", err)
+    }
+    defer resp.Body.Close()
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return "", fmt.Errorf("failed to read response body: %v", err)
+    }
+
+    return string(body), nil
+}
+
+func main() {
+    publicKey, err := fetchActivePublicKey()
+    if err != nil {
+        log.Fatalf("Error fetching public key: %v", err)
+    }
+    fmt.Println("Active Public Key:\n", publicKey)
+}
+
+
+  ```
 
 Retrieve current public key via the controller's /v1/cert.pem.
 
