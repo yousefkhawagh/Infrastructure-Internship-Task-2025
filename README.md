@@ -271,7 +271,49 @@ Introduce a private `/decrypt` endpoint (POST) in the controller:
 
 - RBAC-protected and internal-only.
 
-  
+  ## Code Implementation
+
+```go
+package controller
+
+import (
+    "encoding/json"
+    "net/http"
+    "log"
+)
+
+type DecryptRequest struct {
+    SealedSecret string `json:"sealedSecret"`
+}
+
+type DecryptResponse struct {
+    Secret string `json:"secret"`
+}
+
+func decryptHandler(w http.ResponseWriter, r *http.Request) {
+    var req DecryptRequest
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "Invalid request body", http.StatusBadRequest)
+        return
+    }
+
+    decryptedSecret, err := decryptSealedSecret(req.SealedSecret)
+    if err != nil {
+        http.Error(w, "Decryption failed", http.StatusInternalServerError)
+        return
+    }
+
+    resp := DecryptResponse{Secret: decryptedSecret}
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(resp)
+}
+
+func main() {
+    http.HandleFunc("/decrypt", decryptHandler)
+    log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+ ``` 
 
 4.  **🔁 Re-encrypt Secrets Using New Public Key**
 
