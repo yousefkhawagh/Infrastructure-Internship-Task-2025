@@ -378,6 +378,38 @@ kubectl  apply  -f  sealed-secret.yaml
 
 Optionally back up the previous version via `--backup`.
 
+.
+
+## Code Implementation
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "os/exec"
+)
+
+func applySealedSecret(filePath string) error {
+    cmd := exec.Command("kubectl", "apply", "-f", filePath)
+    err := cmd.Run()
+    if err != nil {
+        return fmt.Errorf("failed to apply SealedSecret: %v", err)
+    }
+    return nil
+}
+
+func main() {
+    filePath := "/path/to/sealed-secret.yaml"
+    if err := applySealedSecret(filePath); err != nil {
+        log.Fatalf("Error applying SealedSecret: %v", err)
+    }
+    fmt.Println("Successfully applied SealedSecret")
+}
+
+```
+
   
 
 6.  **📊 Logging and Reporting**
