@@ -5,7 +5,7 @@
 
 ## 🔐 Bitnami Sealed Secrets (kubeseal) - Key Concepts
 
-  
+
 
 ### What Are Sealed Secrets?
 
